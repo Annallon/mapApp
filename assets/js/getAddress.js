@@ -1,13 +1,36 @@
+const userArray=[]
+
 document.querySelector('#addNewUser').addEventListener('submit', function(event) {
     event.preventDefault()
     var addressField = document.getElementById("location")
-    var addressValid;
+
     if(isPostcodeValid(addressField.value)){
-        addressValid = true;
-    } else {
-        addressValid = false;
+        codeAddress(addressField.value, function(array){
+            userArray.push(array)
+            console.log(userArray)  
+        });
+
+
+    } else if(!isPostcodeValid(addressField.value)) {
+        console.log('postcode error')
     }
-    console.log(addressValid);
+
+
+    // codeAddress(addressField.value, function(array){
+    //     userArray.push(array)
+    //     console.log(userArray)  
+    // });
+    
+    // async function callingAPI(addressField) {
+    
+    // var foo = await codeAddress(addressField.value);
+    // console.log(foo);
+    // }
+
+    //callingAPI(addressField);
+    // codeAddress(addressField.value, function(results, status) {
+    //     console.log.
+    // })
 });
 
 
@@ -18,3 +41,27 @@ function isPostcodeValid(postcode) {
     }
     return false
 }
+
+function codeAddress(address, callback) {
+    var array = [];
+    var geocoder = new google.maps.Geocoder();
+     var request = {
+        address: address,
+        componentRestrictions: {
+            country: 'UK'
+        }
+    }
+      geocoder.geocode(request, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        var latitude = results[0].geometry.location.lat();
+        var longitude = results[0].geometry.location.lng();
+        
+        array.push(latitude); 
+        array.push(longitude);
+        callback(array);
+        
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
