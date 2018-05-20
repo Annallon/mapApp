@@ -1,5 +1,4 @@
-const userArray= createArray(2);
-console.log(userArray);
+const userArray = []; 
 
 document.querySelector('#addNewUser').addEventListener('submit', function(event) {
     event.preventDefault()
@@ -7,9 +6,10 @@ document.querySelector('#addNewUser').addEventListener('submit', function(event)
 
     if (isPostcodeValid(addressField.value)) {
         codeAddress(addressField.value, function(array){
-        console.log(array);
-        checkIfExisting(array);
-        console.log(userArray + " userarry")
+        var postcode = addressField.value;
+        
+        checkIfExisting(array, userArray);
+        console.log(userArray);
         });
     } else if(!isPostcodeValid(addressField.value)) {
         console.log('postcode error')
@@ -17,23 +17,21 @@ document.querySelector('#addNewUser').addEventListener('submit', function(event)
 });
 
 
-function checkIfExisting(array) {
-    if (postcodeCheck(array)){
-        
+function checkIfExisting(array, userArray) {
+ 
+    if (postcodeCheck(array, userArray)){
         return false;
     }
-    console.log(userArray + " display")
-
     userArray.push(array);
     return true;
-    
 }
 
-function postcodeCheck(array) {
-    return userArray.some(function(el) {
-    return el.array === array;
-
-});
+function postcodeCheck(array, userArray) {
+    for (var i=0; i < userArray.length; i++){
+        if (userArray[i][0] == array[0] && userArray[i][1] == array[1])
+        return true;
+    }
+ return false;
 }
 
 function isPostcodeValid(postcode) {
@@ -59,8 +57,7 @@ function codeAddress(address, callback) {
         var latitude = results[0].geometry.location.lat();
         var longitude = results[0].geometry.location.lng();
         
-        array.push(latitude); 
-        array.push(longitude);
+        array.push(latitude, longitude); 
         callback(array);
         
       } else {
@@ -70,15 +67,3 @@ function codeAddress(address, callback) {
   }
 
 
-
-  function createArray(length) {
-    var arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while(i--) arr[length-1 - i] = createArray.apply(this, args);
-    }
-
-    return arr;
-}
